@@ -23,8 +23,11 @@ $(function() {
             .done(function( data ) {
                  console.log('submit', data)
                 if (data.success && data.success.length > 0) {
-                    createNewBook(data.success[0])
+                    createNewBook(data.success[0]);
+                    showModal('Dodano książkę');
                 }
+            }).fail(function() {
+                showModal('Wystąpił błąd podczas dodawania książki');
             })
     });
 
@@ -51,7 +54,10 @@ $(function() {
         }).done(function(data) {
             //console.log(data.success);
             $me.parent().parent().parent().remove();
-            $bookEditSelect.find('option[value=' + $me.data('id') + ']').remove()
+            $bookEditSelect.find('option[value=' + $me.data('id') + ']').remove();
+            showModal('Usunięto książkę');
+        }).fail(function() {
+            showModal('Wystąpił błąd podczas usuwania książki');
         })
 
     })
@@ -93,7 +99,10 @@ $(function() {
                 .siblings('.bookTitle')
                 .text(bookTitle);
             $bookEditSelect.find('option[value='+bookId+']')
-                .text(bookTitle)
+                .text(bookTitle);
+            showModal('Edycja zakończona pomyślnie');
+        }).fail(function() {
+            showModal('Wystąpił błąd podczas edycji książki');
         })
 
     });
