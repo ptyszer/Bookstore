@@ -56,10 +56,11 @@ $(function() {
                 .done(function( data ) {
                     //console.log('get data', data)
                     if (data.success && data.success.length > 0) {
+                        let author = data.success[0];
                         $authorEditForm.css('display', 'block');
-                        $authorEditForm.find('#id').val( data.success[0]['id'] );
-                        $authorEditForm.find('#name').val( data.success[0]['name'] );
-                        $authorEditForm.find('#surname').val( data.success[0]['surname'] );
+                        $authorEditForm.find('#id').val(author.id);
+                        $authorEditForm.find('#name').val(author.name);
+                        $authorEditForm.find('#surname').val(author.surname);
                     }
                 })
         } else {
@@ -92,6 +93,31 @@ $(function() {
         })
     });
 
+    //show books
+    $authorsList.on('click', '.btn-author-books', function () {
+        //console.log(this);
+        let $authorBooksList = $(this).parent().parent().find('.authorBooksList');
+
+        $.get('../rest/rest.php/author/' + $(this).data('id'))
+            .done(function( data ) {
+                //console.log('get data', data)
+                if (data.success && data.success.length > 0) {
+                    let author = data.success[0];
+                    $authorBooksList.text('');
+                    $authorBooksList.toggle();
+                    if (author.books && author.books.length > 0) {
+                        author.books.forEach(function(book) {
+                            let $li = $('<li>');
+                            $li.text(book.title);
+                            $authorBooksList.append($li)
+                        })
+                    } else {
+                        $authorBooksList.text('brak książek...');
+                    }
+                }
+            })
+    });
+
 })
 
 let createNewAuthor = (author) => {
@@ -101,16 +127,19 @@ let createNewAuthor = (author) => {
     let $heading = $('<div>', {class: 'panel-heading'});
     let $authorTitle = $('<span>', {class: 'authorTitle'});
     let $buttonRemove = $('<button class="btn btn-danger pull-right btn-xs btn-author-remove"><i class="fa fa-trash"></i></button>');
+    let $buttonBookList = $('<button class="btn btn-primary pull-right btn-xs btn-author-books"><i class="fa fa-book"></i></button>');
+    let $authorBooksList = $('<ul>', {class: 'authorBooksList'});
     let $authorEditSelect = $('#authorEditSelect');
     let $option = $('<option>');
 
     $authorTitle.text(author.name + ' ' + author.surname);
     $buttonRemove.attr('data-id', author.id);
+    $buttonBookList.attr('data-id', author.id);
     $option.val(author.id);
     $option.text(author.name + ' ' + author.surname);
 
-    $heading.append($authorTitle).append($buttonRemove);
-    $panel.append($heading);
+    $heading.append($authorTitle).append($buttonRemove).append($buttonBookList);
+    $panel.append($heading).append($authorBooksList);
     $li.append($panel);
     $authorsList.append($li);
     $authorEditSelect.append($option)

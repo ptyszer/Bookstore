@@ -3,14 +3,33 @@ $(function() {
     var $bookList = $('#booksList');
     var $bookEditSelect = $('#bookEditSelect');
     var $bookEditForm = $('#bookEdit');
+    var $bookAddAuthor = $bookAddForm.find('#author_id');
+    var $bookEditAuthor = $bookEditForm.find('#author_id_edit');
 
     //get book list
     $.get('../rest/rest.php/book')
         .done(function( data ) {
-             //console.log('get data', data);
+             console.log('get data', data);
             if (data.success && data.success.length > 0) {
-                data.success.forEach(function(elm) {
-                    createNewBook(elm)
+                data.success.forEach(function(book) {
+                    createNewBook(book);
+                })
+            }
+        });
+
+    //get authors list
+    $.get('../rest/rest.php/author')
+        .done(function( data ) {
+            //console.log('get data', data);
+            if (data.success && data.success.length > 0) {
+                data.success.forEach(function(author) {
+                    //console.log(author);
+                    let $authorOption = $('<option>');
+                    $authorOption.val(author.id);
+                    $authorOption.text(author.name + ' ' + author.surname);
+
+                    $authorOption.appendTo($bookAddAuthor);
+                    $authorOption.clone().appendTo($bookEditAuthor);
                 })
             }
         });
@@ -33,20 +52,20 @@ $(function() {
 
     //description display
     $bookList.on('click', '.btn-book-show-description', function () {
-        var $bookDescription = $(this).parent().parent().find('.book-description');
+        let $bookDescription = $(this).parent().parent().find('.book-description');
         $.get('../rest/rest.php/book/' + $(this).data('id'))
             .done(function( data ) {
                 //console.log('get data', data)
                 if (data.success && data.success.length > 0) {
-                    var description = data.success[0]['description'];
-                    $bookDescription.toggle().html(description)
+                    let book = data.success[0];
+                    $bookDescription.toggle().html(book.description)
                 }
             })
     });
 
     //delete book
     $bookList.on('click', '.btn-book-remove', function () {
-        $me = $(this);
+        let $me = $(this);
         $.ajax({
             url: '../rest/rest.php/book/' + $(this).data('id'),
             type: "DELETE",
@@ -69,10 +88,12 @@ $(function() {
                 .done(function( data ) {
                     //console.log('get data', data)
                     if (data.success && data.success.length > 0) {
+                        let book = data.success[0];
                         $bookEditForm.css('display', 'block');
-                        $bookEditForm.find('#id').val( data.success[0]['id'] );
-                        $bookEditForm.find('#title').val( data.success[0]['title'] );
-                        $bookEditForm.find('#description').val( data.success[0]['description'] );
+                        $bookEditAuthor.val(book.author.id);
+                        $bookEditForm.find('#id').val(book.id);
+                        $bookEditForm.find('#title').val(book.title);
+                        $bookEditForm.find('#description').val(book.description);
                     }
                 })
         } else {
@@ -91,8 +112,9 @@ $(function() {
             type: "PATCH",
             dataType: "json"
         }).done(function(data) {
-            let bookTitle = data.success[0]['title'];
-            //console.log(data);
+            let book = data.success[0];
+            let bookTitle = book.title + ' (' + book.author.name + ' ' + book.author.surname + ')';
+
             $bookEditForm.css('display', 'none');
             $bookEditSelect.val('');
             $bookList.find('[data-id='+bookId+']')
@@ -120,18 +142,19 @@ let createNewBook = (book) => {
     let $buttonShowDescription = $('<button class="btn btn-primary pull-right btn-xs btn-book-show-description"><i class="fa fa-info-circle"></i></button>');
     let $bookDescription = $('<div>', {class: 'panel-body book-description'});
     let $bookEditSelect = $('#bookEditSelect');
-    let $option = $('<option>');
+    let $bookEditOption = $('<option>');
+    let title = book.title + ' (' + book.author.name + ' ' + book.author.surname + ')';
 
-    $bookTitle.text(book.title);
+    $bookTitle.text(title);
     $bookDescription.text(book.description);
     $buttonRemove.attr('data-id', book.id);
     $buttonShowDescription.attr('data-id', book.id);
-    $option.val(book.id);
-    $option.text(book.title);
+    $bookEditOption.val(book.id);
+    $bookEditOption.text(title);
 
     $heading.append($bookTitle).append($buttonRemove).append($buttonShowDescription);
     $panel.append($heading).append($bookDescription);
     $li.append($panel);
     $booksList.append($li);
-    $bookEditSelect.append($option)
+    $bookEditSelect.append($bookEditOption)
 }
