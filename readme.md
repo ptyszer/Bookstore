@@ -1,10 +1,11 @@
-<img alt="Logo" src="http://coderslab.pl/svg/logo-coderslab.svg" width="400">
+# Bookstore
 
-# PHP - Warsztat 3
-
-branch `master` - zawiera funkcjonalność książki
-
-branch `api_v2` - zawiera funkcjonalność książki i autora
-
-branch `api_v3` - zawiera funkcjonalność książki i autora w relacji ze sobą
-
+Aplikacja do wypożyczania książek.
+Projekt składa się z dwóch części:
+  * Serwer – napisany w PHP, implementujący
+    funkcjonalność REST,
+  * Klient – napisany w HTML-u i JavaScript,
+    komunikujący się z serwerem za pomocą
+    AJAX.
+Obie te części działają w pełni niezależnie od
+siebie.
