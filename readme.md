@@ -7,5 +7,6 @@ Projekt składa się z dwóch części:
   * Klient – napisany w HTML-u i JavaScript,
     komunikujący się z serwerem za pomocą
     AJAX.
+    
 Obie te części działają w pełni niezależnie od
 siebie.
